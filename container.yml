@@ -1,0 +1,35 @@
+version: "2"
+settings:
+  # The deployment_output_path is mounted to the Conductor container, so
+  # that the `run` and `deployment` commands can write generated Ansible
+  # playbooks to it.
+  # deployment_output_path: ~/ansible-deployment
+  # The Conductor container does the heavy lifting, and provides a portable
+  # Python runtime for building your target containers. It should be derived
+  # from the same distribution as you're building your target containers with.
+  conductor_base: centos:7
+
+services:
+  # Add your containers here, specifying the base image you want to build from
+  # For example:
+  #
+  web:
+    from: centos:7
+    roles:
+      - dumb-init
+      - httpd
+      - epelrepo
+      - sclrepo
+      - remirepo
+      - php
+    ports:
+      - "80:8080"
+    command: ['/usr/local/bin/dumb-init', '/usr/sbin/httpd', '-D', 'FOREGROUND']
+    environment:
+      #      - http_proxy=http://
+      #      - https_proxy=http://
+registries: {}
+  # Add optional registries used for deployment. For example:
+  #  google:
+  #    url: https://gcr.io
+  #    namespace: my-cool-project-xxxxxx   

@@ -1,0 +1,51 @@
+---
+- name: install php
+  yum: name={{ item }} disablerepo=remi-safe state=present
+  with_items:
+    - php55
+    - php55-php
+    - php55-php-pdo
+    - php55-php-mysqli
+    - php-mcrypt
+    - php55-php-gd
+    - php55-php-soap
+    - php55-php-mysqlnd
+
+- name: install php redis remi repo
+  yum: name={{ item }} enablerepo=remi,remi-php55 state=present
+  with_items:
+    - php-pecl-redis
+    # this brings in igbinary as a dependency
+
+- name: SymLink
+  file: dest=/opt/rh/php55/root/lib64/php/modules/igbinary.so src=/usr/lib64/php/modules/igbinary.so state=link
+
+- name: SymLink
+  file: dest=/opt/rh/php55/root/lib64/php/modules/redis.so src=/usr/lib64/php/modules/redis.so state=link
+
+- name: SymLink
+  file: dest=/opt/rh/php55/root/lib64/php/modules/mcrypt.so src=/usr/lib64/php/modules/mcrypt.so state=link
+
+- name: Copy new redis.ini
+  template: src=redis.ini.j2 dest=/opt/rh/php55/root/etc/php.d/redis.ini
+
+- name: Copy new igbinary.ini
+  copy: remote_src=True src=/etc/php.d/igbinary.ini dest=/opt/rh/php55/root/etc/php.d
+
+- name: Copy new mcrypt.ini
+  copy: remote_src=True src=/etc/php.d/mcrypt.ini dest=/opt/rh/php55/root/etc/php.d
+
+- name: Copy new php55 apache config files
+  copy: remote_src=True src=/opt/rh/httpd24/root/etc/httpd/conf.d/php55-php.conf dest=/etc/httpd/conf.d/
+  #  notify: restart httpd
+
+- name: Copy new php55 apache config files
+  copy: remote_src=True src=/opt/rh/httpd24/root/etc/httpd/conf.modules.d/10-php55-php.conf dest=/etc/httpd/conf.modules.d/
+  #  notify: restart httpd
+
+- name: Copy new php55 apache config files
+  copy: remote_src=True src=/opt/rh/httpd24/root/etc/httpd/modules/libphp55-php5.so dest=/etc/httpd/modules/ mode=0755
+  #  notify: restart httpd
+
+- name: Copy enablephp55 to profile.d
+  copy: src=files/enablephp55.sh dest=/etc/profile.d/enablephp55.sh

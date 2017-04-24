@@ -1,0 +1,8 @@
+---
+- name: copy dumb-init
+  copy: src=files/dumb-init_1.2.0_amd64 dest="{{dumb_init_install_dir}}" mode=075
+  #- name: download the dumb-init binary and mark it executable
+  #get_url:
+  #  url: "{{dumb_init_download_url}}"
+  #  dest: "{{dumb_init_install_dir}}"
+  #  mode: 0755

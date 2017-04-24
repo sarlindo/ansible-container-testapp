@@ -1,0 +1,8 @@
+---
+- name: Install SCL in RHEL
+  command: yum-config-manager --enable rhui-REGION-rhel-server-rhscl
+  when: ansible_os_family == 'RedHat' and ansible_distribution != 'CentOS'
+
+- name: Install SCL in CentOS
+  yum: name=centos-release-scl state=present
+  when: ansible_distribution == 'CentOS'
